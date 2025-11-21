@@ -1,39 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <meta name="theme-color" content="#0f172a">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Cyberpunk HUD</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              mono: ['"Share Tech Mono"', 'monospace'],
-            },
-            colors: {
-              cyan: {
-                400: '#22d3ee',
-                500: '#06b6d4',
-                900: '#164e63',
-              },
-              slate: {
-                850: '#172033', // Custom dark slate
-                900: '#0f172a',
-              }
-            },
-            boxShadow: {
-              'glow': '0 0 10px rgba(34, 211, 238, 0.3), 0 0 2px rgba(34, 211, 238, 0.5)',
-              'glow-text': '0 0 4px rgba(34, 211, 238, 0.6)',
-            },
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+  <meta name="theme-color" content="#0f172a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Cyberpunk HUD</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    body{margin:0;background:#000;font-family:'Share Tech Mono',monospace;color:#94a3b8;overflow:hidden}
+    /* same glow / scanline / noise you already had */
+    .scanlines::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:20;background:linear-gradient(rgba(18,16,16,0) 50%,rgba(0,0,0,.25) 50%),linear-gradient(90deg,rgba(255,0,0,.06),rgba(0,255,0,.02),rgba(0,0,255,.06));background-size:100% 2px,3px 100%}
+    .bg-noise{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%230e1321'/%3E%3Crect width='1' height='1' fill='%23172033'/%3E%3C/svg%3E")}
+    .text-shadow-glow{text-shadow:0 0 4px rgba(34,211,238,.6)}
+    .scrollbar-hide::-webkit-scrollbar{display:none}
+    .custom-scrollbar::-webkit-scrollbar{width:4px}
+    .custom-scrollbar::-webkit-scrollbar-track{background:#0f172a}
+    .custom-scrollbar::-webkit-scrollbar-thumb{background:#22d3ee;border-radius:2px}
+  </style>
+</head>
+<body class="bg-black">
+  <div id="root" class="w-full h-screen bg-slate-900 text-cyan-400 font-mono flex flex-col scanlines overflow-hidden">
+    <!-- static copy of your generated markup -->
+    <div class="absolute inset-0 bg-noise opacity-20 pointer-events-none mix-blend-overlay"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-[#172033] via-slate-900 to-black pointer-events-none"></div>
+
+    <!-- top bar -->
+    <div class="flex justify-between items-center px-4 md:px-6 py-4 text-xs tracking-widest opacity-80 z-10 border-b border-cyan-900/30 bg-slate-900/80 backdrop-blur-sm">
+      <span>NET: CONNECTED</span>
+      <span id="dateEl">SUNDAY 01</span>
+      <span id="batteryEl">100% 🔋</span>
+    </div>
+
+    <!-- main grid -->
+    <div class="flex-1 overflow-y-auto scrollbar-hide pb-20 px-4 md:px-8 max-w-7xl mx-auto w-full">
+      <!-- big clock -->
+      <div class="z-10 mb-6">
+        <div class="border border-cyan-500/30 bg-slate-900/50 p-1 relative">
+          <div class="px-4 py-2 bg-slate-850/50">
+            <div class="text-5xl md:text-7xl tracking-widest text-cyan-100 text-shadow-glow font-bold tabular-nums" id="clockEl">00:00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- weather + media row -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        <!-- weather -->
+        <div class="border border-cyan-500/30 bg-slate-900/50 p-3 relative">
+          <div class="flex items-start gap-4 h-full">
+            <div class="w-24 h-24 border border-cyan-500/30 flex flex-col items-center justify-center bg-slate-900/80 shrink-0">
+              <span class="text-xl font-bold text-cyan-100">24°</span>
+            </div>
+            <div class="flex-1 flex flex-col justify-between h-24 py-1">
+              <div>
+                <div class="text-[10px] text-slate-400">LOCAL</div>
+                <div class="text-xl text-cyan-100">CLOUDY</div>
+              </div>
+              <div class="h-2 bg-cyan-900/30 relative overflow-hidden">
+                <div class="absolute top-0 left-0 h-full w-1/3 bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)] animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- media player -->
+        <div class="border border-cyan-500/30 p-3 relative bg-slate-900/50 h-full flex flex-col justify-between min-h-[120px]">
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <div class="text-cyan-100 text-sm tracking-widest uppercase">Night City Dreams</div>
+              <div class="text-cyan-600 text-[10px] uppercase tracking-wider">Artemis Prime</div>
+            </div>
+            <div class="flex gap-2">
+              <button class="border border-cyan-500/50 p-2 hover:bg-cyan-500/20">▶</button>
+              <button class="border border-cyan-500/50 p-2 hover:bg-cyan-500/20">⏭</button>
+            </div>
+          </div>
+          <div class="py-2 relative w-full mt-auto">
+            <div class="w-full h-[1px] bg-slate-700"></div>
+            <div class="absolute h-3 w-0.5 bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]" style="left:30%"></div>
+          </div>
+          <div class="flex justify-between text-[10px] text-slate-500">
+            <span>00:30</span><span>03:45</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- news feed -->
+      <div class="flex-1 z-10 flex flex-col min-h-[200px] mb-4">
+        <div class="flex justify-between items-center mb-2 bg-slate-800/30 py-1 px-2 border-l-2 border-cyan-500/50">
+          <span class="text-xs text-cyan-300 uppercase tracking-wider">DATA FEED / LIVE STREAM</span>
+          <div class="w-1 h-1 bg-cyan-500 animate-pulse"></div>
+        </div>
+        <div class="flex-1 bg-slate-900/30 border border-slate-800 p-4 overflow-y-auto custom-scrollbar text-sm text-slate-400 leading-relaxed">
+          <div>[01] Neural implant firmware v3.2.1 leaks onto dark-web.</div>
+          <div>[02] Tokyo tower hacked—15-minute drone-light show hijacked.</div>
+          <div>[03] Crypto-wallet brain-scanner scam nets 2.3 M credits.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- bottom search -->
+    <div class="p-4 z-20 bg-gradient-to-t from-black via-black to-transparent shrink-0">
+      <div class="max-w-7xl mx-auto">
+        <div class="border border-cyan-700/50 p-2 flex items-center bg-slate-900/90">
+          <span class="text-cyan-600 mx-2">🔍</span>
+          <input id="searchInp" type="text" placeholder="ENTER COMMAND OR SEARCH QUERY..."
+                 class="bg-transparent outline-none text-cyan-400 w-full text-xs uppercase tracking-widest placeholder-slate-600 font-mono">
+        </div>
+        <div class="flex justify-between items-center pt-4 mt-2 border-t border-cyan-500/30 text-[10px] tracking-widest">
+          <button class="w-1/4 py-2 border-r border-slate-800 text-cyan-400 hover:bg-cyan-900/20">HOME</button>
+          <button class="w-1/4 py-2 border-r border-slate-800 text-slate-400 hover:bg-cyan-900/20">LOGS</button>
+          <button class="w-1/4 py-2 border-r border-slate-800 text-slate-400 hover:bg-cyan-900/20">COMMS</button>
+          <button class="w-1/4 py-2 text-slate-400 hover:bg-cyan-900/20">SYS</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- tiny runtime for clock + battery -->
+  <script>
+    const $ = q => document.querySelector(q);
+    function tick() {
+      const d = new Date();
+      $('#clockEl').textContent = d.toLocaleTimeString('en-US',{hour12:true}).toUpperCase();
+      $('#dateEl').textContent = d.toLocaleDateString('en-US',{weekday:'long',day:'2-digit'}).toUpperCase();
+    }
+    tick(); setInterval(tick, 1000);
+    // dummy battery
+    $('#batteryEl').textContent = '87% 🔋';
+  </script>
+</body>
+</html>
             backgroundImage: {
               'noise': "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjMGUxMzIxIi8+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiMxNzIwMzMiLz4KPC9zdmc+')",
             }
