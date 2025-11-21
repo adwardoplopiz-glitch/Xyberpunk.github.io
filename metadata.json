@@ -1,0 +1,7 @@
+{
+  "name": "Cyberpunk HUD Interface",
+  "description": "A pixel-perfect clone of a futuristic mobile UI interface featuring weather, media controls, and news feed with a sci-fi aesthetic.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
